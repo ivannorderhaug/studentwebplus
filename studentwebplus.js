@@ -47,3 +47,98 @@ for (let i = 0; i < resultatRows.length; i++) {
         }
     }
 }
+
+let checkboxes = document.querySelectorAll('.grade-checkbox');
+let studyPoints = document.querySelectorAll('.col7Studiepoeng span');
+
+let lastRow = document.querySelector("tr:last-of-type");
+let lastTd = lastRow.querySelector("td:last-of-type");
+
+// Create a new button element
+let button = document.createElement("button");
+button.innerHTML = "Velg alle";
+button.style.verticalAlign = "middle";
+button.style.cursor = "pointer";
+button.className = "ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only small grey";
+button.style.color = "black";
+
+
+// Create a new button element
+let p = document.createElement("p");
+p.innerHTML = "Du må velge minst ett emne for å kunne regne ut snittet ditt.";
+p.style.color = "black";
+p.style.fontSize = "14px";
+p.style.marginLeft = "25px";
+p.style.position = "relative";
+
+
+
+// Append the button to the last td element
+lastTd.appendChild(button);
+lastRow.appendChild(p);
+
+let checkboxCount = 0;
+// Add event listener for the button
+button.addEventListener("click", function(event) {
+    event.preventDefault();
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = !checkboxes[i].checked;
+        checkboxCount = checkboxes[i].checked ? checkboxCount + 1 : checkboxCount - 1;
+    }
+
+    if (checkboxCount == checkboxes.length) {
+        console.log(calculate());
+    } else {
+        p.innerHTML = "Du må velge minst ett emne for å kunne regne ut snittet ditt.";
+    }
+});
+
+for (let i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].addEventListener('change', function() {
+        if (this.checked) {
+            checkboxCount++;
+        } else {
+            checkboxCount--;
+        }
+        if (checkboxCount >= 1) {
+            console.log(calculate());
+        } else {
+            p.innerHTML = "Du må velge minst ett emne for å kunne regne ut snittet ditt.";
+        }
+    });
+}
+
+function calculate(){
+    let totaltEcts = 0;
+    let totaltEctsForCalculation = 0;
+    let sumGrades = 0;
+
+    for (let i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            let ects = Number(studyPoints[i].textContent.replace(",", "."));
+            totaltEcts += ects;
+            if (checkboxes[i].value != "Bestått") {
+                let numberGrade = checkboxes[i].value.charCodeAt(0) <= 69 ? 5 - (checkboxes[i].value.charCodeAt(0) - 65) : 0;
+                totaltEctsForCalculation += ects;
+                sumGrades += numberGrade * ects;
+            }
+        }
+    }
+
+    let snitt = (sumGrades / totaltEctsForCalculation);
+    let letterGrade = "";
+
+    if (snitt >= 4.5) {
+        letterGrade = "A";
+    } else if (snitt >= 3.5 && snitt < 4.5) {
+        letterGrade = "B";
+    } else if (snitt >= 2.5 && snitt < 3.5) {
+        letterGrade = "C";
+    } else if (snitt >= 1.5 && snitt < 2.5) {
+        letterGrade = "D";
+    } else if (result < 1.5) {
+        letterGrade = "E";
+    }
+
+    p.innerHTML = "Ditt snitt er " + snitt.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + totaltEcts + " studiepoeng)";
+}
