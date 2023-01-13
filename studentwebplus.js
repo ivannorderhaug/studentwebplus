@@ -29,12 +29,12 @@ for (let i = 0; i < resultatRows.length; i++) {
         checkboxLabel.style.color = "black";
         checkboxLabel.style.verticalAlign = "middle";
         checkboxLabel.style.marginTop = "10px";
-        checkboxLabel.style.marginLeft = "25px";
+        checkboxLabel.style.marginLeft = "15px";
         checkboxLabel.style.fontSize = "14px";
         checkboxLabel.style.fontWeight = "bold";
         //move both the checkbox and the label to the left
         checkboxLabel.style.position = "relative";
-        checkboxLabel.style.left = "-20px";
+        checkboxLabel.style.left = "-10px"; //move the label to the left
         
         // Append the checkbox to the label
         checkboxLabel.appendChild(checkbox);
@@ -60,7 +60,6 @@ button.innerHTML = "Velg alle";
 button.style.verticalAlign = "middle";
 button.style.cursor = "pointer";
 button.className = "ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only small grey";
-button.style.color = "black";
 
 
 // Create a new button element
@@ -78,32 +77,51 @@ lastTd.appendChild(button);
 lastRow.appendChild(p);
 
 let checkboxCount = 0;
-// Add event listener for the button
 button.addEventListener("click", function(event) {
     event.preventDefault();
+    let allChecked = true;
     for (let i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = !checkboxes[i].checked;
-        checkboxCount = checkboxes[i].checked ? checkboxCount + 1 : checkboxCount - 1;
+        if (!checkboxes[i].checked) {
+            allChecked = false;
+            break;
+        }
     }
-
-    if (checkboxCount == checkboxes.length) {
-        console.log(calculate());
+    if (allChecked) {
+        for (let i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = false;
+        }
+        button.textContent = "Velg alle";
     } else {
-        p.innerHTML = "Du må velge minst ett emne for å kunne regne ut snittet ditt.";
+        for (let i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = true;
+        }
+        button.textContent = "Fjern alle";
+    }
+    checkboxCount = 0;
+    for (let i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            checkboxCount++;
+        }
+    }
+    if (checkboxCount > 0) {
+        calculate();
+    } else {
+        p.textContent = "Du må velge minst ett emne for å kunne regne ut snittet ditt.";
     }
 });
 
 for (let i = 0; i < checkboxes.length; i++) {
     checkboxes[i].addEventListener('change', function() {
-        if (this.checked) {
-            checkboxCount++;
-        } else {
-            checkboxCount--;
+        checkboxCount = 0;
+        for (let i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                checkboxCount++;
+            }
         }
-        if (checkboxCount >= 1) {
-            console.log(calculate());
+        if (checkboxCount > 0) {
+            calculate();
         } else {
-            p.innerHTML = "Du må velge minst ett emne for å kunne regne ut snittet ditt.";
+            p.textContent = "Du må velge minst ett emne for å kunne regne ut snittet ditt.";
         }
     });
 }
@@ -125,7 +143,13 @@ function calculate(){
         }
     }
 
+    if (sumGrades == 0 && totaltEctsForCalculation > 0) {
+        p.textContent = "Du har bestått alle emnene du har valgt, men de har ikke bokstavkarakter. Derfor kan vi ikke regne ut snittet ditt.";
+        return;
+    }
+
     let snitt = (sumGrades / totaltEctsForCalculation);
+
     let letterGrade = "";
 
     if (snitt >= 4.5) {
@@ -140,5 +164,5 @@ function calculate(){
         letterGrade = "E";
     }
 
-    p.innerHTML = "Ditt snitt er " + snitt.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + totaltEcts + " studiepoeng)";
+    p.textContent = "Ditt snitt er " + snitt.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + totaltEcts + " studiepoeng)";
 }
