@@ -1,0 +1,17 @@
+{
+    "manifest_version": 2,
+    "name": "Studentweb Plus",
+    "version": "1.0",
+    "description": "An extension that adds some extra features to Studentweb.",
+    "icons": {
+        "48": "icons/icon.png"
+    },
+    "permissions": ["activeTab", "storage", "https://fsweb.no/studentweb/resultater.jsf"],
+    "content_scripts": [
+        {
+            "matches": ["https://fsweb.no/studentweb/resultater.jsf"],
+            "js": ["studentwebplus.js"],
+            "run_at": "document_end"
+        }
+    ]
+}
