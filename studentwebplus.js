@@ -64,7 +64,7 @@ button.className = "ui-button ui-widget ui-state-default ui-corner-all ui-button
 
 // Create a new button element
 let p = document.createElement("p");
-p.innerHTML = "Du må velge minst ett emne for å kunne regne ut snittet ditt.";
+p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
 p.style.color = "black";
 p.style.fontSize = "14px";
 p.style.marginLeft = "25px";
@@ -77,6 +77,9 @@ lastTd.appendChild(button);
 lastRow.appendChild(p);
 
 let checkboxCount = 0;
+let hasLetterGrade = false; // flag to keep track of whether a checkbox with a letter grade is selected
+
+// Add event listener for the button
 button.addEventListener("click", function(event) {
     event.preventDefault();
     let allChecked = true;
@@ -89,43 +92,63 @@ button.addEventListener("click", function(event) {
     if (allChecked) {
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = false;
+            if (checkboxes[i].value !== "Bestått") {
+                hasLetterGrade = false;
+            }
         }
-        button.textContent = "Velg alle";
+        button.innerHTML = "Velg alle";
     } else {
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = true;
+            if (checkboxes[i].value !== "Bestått") {
+                hasLetterGrade = true;
+            }
         }
-        button.textContent = "Fjern alle";
+        button.innerHTML = "Fjern alle";
     }
     checkboxCount = 0;
     for (let i = 0; i < checkboxes.length; i++) {
         if (checkboxes[i].checked) {
             checkboxCount++;
+            if (checkboxes[i].value !== "Bestått") {
+                hasLetterGrade = true;
+            }
         }
     }
-    if (checkboxCount > 0) {
+    if (checkboxCount > 0 && hasLetterGrade) {
         calculate();
     } else {
-        p.textContent = "Du må velge minst ett emne for å kunne regne ut snittet ditt.";
+        if (checkboxCount === 0){
+            p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
+        } else {
+            p.innerHTML = "Du må velge minst ett emne som har bokstavkarakter for å kunne regne ut snittet ditt.";
+        }
     }
 });
 
 for (let i = 0; i < checkboxes.length; i++) {
     checkboxes[i].addEventListener('change', function() {
         checkboxCount = 0;
-        for (let i = 0; i < checkboxes.length; i++) {
-            if (checkboxes[i].checked) {
+        hasLetterGrade = false;
+        for (let j = 0; j < checkboxes.length; j++) {
+            if (checkboxes[j].checked) {
                 checkboxCount++;
+                if (checkboxes[j].value !== "Bestått") {
+                    hasLetterGrade = true;
+                }
             }
         }
-        if (checkboxCount > 0) {
+        if (checkboxCount > 0 && hasLetterGrade) {
             calculate();
         } else {
-            p.textContent = "Du må velge minst ett emne for å kunne regne ut snittet ditt.";
+            if (checkboxCount === 0){
+                p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
+            } else {
+                p.innerHTML = "Du må velge minst ett emne som har bokstavkarakter for å kunne regne ut snittet ditt.";
+            }
         }
     });
 }
-
 function calculate(){
     let totaltEcts = 0;
     let totaltEctsForCalculation = 0;
