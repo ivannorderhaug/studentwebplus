@@ -6,47 +6,52 @@ let resultatRows = table.querySelectorAll("tr.resultatTop, tr.none");
 
 // Loop through all the rows in the table and find the grades in the 6th column (index 5) and add them to the grades array. 
 // Each row that has a valid grade will also get a checkbox appended to it.
-for (let i = 0; i < resultatRows.length; i++) {
-    let resultatColumns = resultatRows[i].querySelectorAll("td.col6Resultat");
-    for (let j = 0; j < resultatColumns.length; j++) {
-        let grade = resultatColumns[j].querySelector(".infoLinje span").textContent.trim();
-        let pattern = /^[A-E]|Bestått$/;
-        let isValidGrade = pattern.test(grade);
-        if (isValidGrade) {
-            grades.push(grade);
+function findGrades(){
+    grades = []
+    for (let i = 0; i < resultatRows.length; i++) {
+        let resultatColumns = resultatRows[i].querySelectorAll("td.col6Resultat");
+        for (let j = 0; j < resultatColumns.length; j++) {
+            let grade = resultatColumns[j].querySelector(".infoLinje span").textContent.trim();
+            let pattern = /^[A-E]|Bestått|Passed|Greidd$/;
+            let isValidGrade = pattern.test(grade);
+            if (isValidGrade) {
+                grades.push(grade);
+    
+                // Create a new checkbox element
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "grade-checkbox";
+                checkbox.value = grade;
+                checkbox.style.verticalAlign = "middle";
+                checkbox.style.position = "relative";
 
-        // Create a new checkbox element
-        let checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.className = "grade-checkbox";
-        checkbox.value = grade;
-        checkbox.style.verticalAlign = "middle";
-        checkbox.style.position = "relative";
+                // Create a new label element
+                let checkboxLabel = document.createElement("label");
+                checkboxLabel.appendChild(document.createTextNode("Velg"));
+                checkboxLabel.style.color = "black";
+                checkboxLabel.style.verticalAlign = "middle";
+                checkboxLabel.style.marginTop = "10px";
+                checkboxLabel.style.marginLeft = "15px";
+                checkboxLabel.style.fontSize = "14px";
+                checkboxLabel.style.fontWeight = "bold";
+                //move both the checkbox and the label to the left
+                checkboxLabel.style.position = "relative";
+                checkboxLabel.style.left = "-10px"; //move the label to the left
+                
+                // Append the checkbox to the label
+                checkboxLabel.appendChild(checkbox);
 
-        // Create a new label element
-        let checkboxLabel = document.createElement("label");
-        checkboxLabel.appendChild(document.createTextNode("Velg"));
-        checkboxLabel.style.color = "black";
-        checkboxLabel.style.verticalAlign = "middle";
-        checkboxLabel.style.marginTop = "10px";
-        checkboxLabel.style.marginLeft = "15px";
-        checkboxLabel.style.fontSize = "14px";
-        checkboxLabel.style.fontWeight = "bold";
-        //move both the checkbox and the label to the left
-        checkboxLabel.style.position = "relative";
-        checkboxLabel.style.left = "-10px"; //move the label to the left
-        
-        // Append the checkbox to the label
-        checkboxLabel.appendChild(checkbox);
+                // Append the label to the td element
+                resultatColumns[j].appendChild(checkboxLabel);
 
-        // Append the label to the td element
-        resultatColumns[j].appendChild(checkboxLabel);
-
-        let infoLinje = resultatColumns[j].querySelector(".infoLinje");
-        infoLinje.appendChild(checkboxLabel);    
+                let infoLinje = resultatColumns[j].querySelector(".infoLinje");
+                infoLinje.appendChild(checkboxLabel);    
+            }
         }
     }
 }
+
+findGrades();
 
 let checkboxes = document.querySelectorAll('.grade-checkbox');
 let studyPoints = document.querySelectorAll('.col7Studiepoeng span');
@@ -92,7 +97,7 @@ button.addEventListener("click", function(event) {
     if (allChecked) {
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = false;
-            if (checkboxes[i].value !== "Bestått") {
+            if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
                 hasLetterGrade = false;
             }
         }
@@ -100,17 +105,18 @@ button.addEventListener("click", function(event) {
     } else {
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = true;
-            if (checkboxes[i].value !== "Bestått") {
+            if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
                 hasLetterGrade = true;
             }
         }
         button.innerHTML = "Fjern alle";
     }
     checkboxCount = 0;
+    // If there is at least one checkbox selected and at least one checkbox with a letter grade selected, calculate the average
     for (let i = 0; i < checkboxes.length; i++) {
         if (checkboxes[i].checked) {
             checkboxCount++;
-            if (checkboxes[i].value !== "Bestått") {
+            if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
                 hasLetterGrade = true;
             }
         }
@@ -126,6 +132,8 @@ button.addEventListener("click", function(event) {
     }
 });
 
+// Add event listener for the checkboxes
+// When a checkbox is checked or unchecked, calculate the average
 for (let i = 0; i < checkboxes.length; i++) {
     checkboxes[i].addEventListener('change', function() {
         checkboxCount = 0;
@@ -133,7 +141,7 @@ for (let i = 0; i < checkboxes.length; i++) {
         for (let j = 0; j < checkboxes.length; j++) {
             if (checkboxes[j].checked) {
                 checkboxCount++;
-                if (checkboxes[j].value !== "Bestått") {
+                if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
                     hasLetterGrade = true;
                 }
             }
@@ -158,7 +166,7 @@ function calculate(){
         if (checkboxes[i].checked) {
             let ects = Number(studyPoints[i].textContent.replace(",", "."));
             totaltEcts += ects;
-            if (checkboxes[i].value != "Bestått") {
+            if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
                 let numberGrade = checkboxes[i].value.charCodeAt(0) <= 69 ? 5 - (checkboxes[i].value.charCodeAt(0) - 65) : 0;
                 totaltEctsForCalculation += ects;
                 sumGrades += numberGrade * ects;
