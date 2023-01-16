@@ -1,5 +1,8 @@
 console.log("studentwebplus.js loaded successfully");
 
+// It will add checkboxes to each row that has a valid grade and a button that can be used to select all the checkboxes.
+// It will also calculate the average grade for the selected checkboxes.
+// The script will also add a button that can be used to select all the checkboxes.
 let grades = []
 let table = document.querySelector(".table-standard.reflow.ui-panel-content");
 let resultatRows = table.querySelectorAll("tr.resultatTop, tr.none");
@@ -88,20 +91,23 @@ let hasLetterGrade = false; // flag to keep track of whether a checkbox with a l
 button.addEventListener("click", function(event) {
     event.preventDefault();
     let allChecked = true;
+    // Check if all checkboxes are checked
     for (let i = 0; i < checkboxes.length; i++) {
         if (!checkboxes[i].checked) {
-            allChecked = false;
+            allChecked = false; // If at least one checkbox is not checked, set the flag to false
             break;
         }
     }
+    // If all checkboxes are checked, uncheck all checkboxes and change the button text to "Velg alle"
     if (allChecked) {
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = false;
             if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
-                hasLetterGrade = false;
+                hasLetterGrade = false; // If a checkbox with a letter grade is unchecked, set the flag to false
             }
         }
         button.innerHTML = "Velg alle";
+    // If not all checkboxes are checked, check all checkboxes and change the button text to "Fjern alle"
     } else {
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = true;
@@ -138,10 +144,12 @@ for (let i = 0; i < checkboxes.length; i++) {
     checkboxes[i].addEventListener('change', function() {
         checkboxCount = 0;
         hasLetterGrade = false;
+        // If there is at least one checkbox selected and at least one checkbox with a letter grade selected, calculate the average
         for (let j = 0; j < checkboxes.length; j++) {
             if (checkboxes[j].checked) {
+                console.log(checkboxes[j].value);
                 checkboxCount++;
-                if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
+                if (checkboxes[j].value !== "Bestått" && checkboxes[j].value !== "Passed" && checkboxes[j].value !== "Greidd") {
                     hasLetterGrade = true;
                 }
             }
@@ -149,6 +157,7 @@ for (let i = 0; i < checkboxes.length; i++) {
         if (checkboxCount > 0 && hasLetterGrade) {
             calculate();
         } else {
+            console.log(checkboxCount);
             if (checkboxCount === 0){
                 p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
             } else {
