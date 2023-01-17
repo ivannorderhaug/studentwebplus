@@ -19,39 +19,40 @@ function findGrades(){
             let isValidGrade = pattern.test(grade);
             if (isValidGrade) {
                 grades.push(grade);
-    
-                // Create a new checkbox element
-                let checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.className = "grade-checkbox";
-                checkbox.value = grade;
-                checkbox.style.verticalAlign = "middle";
-                checkbox.style.position = "relative";
-
-                // Create a new label element
-                let checkboxLabel = document.createElement("label");
-                checkboxLabel.appendChild(document.createTextNode("Velg"));
-                checkboxLabel.style.color = "black";
-                checkboxLabel.style.verticalAlign = "middle";
-                checkboxLabel.style.marginTop = "10px";
-                checkboxLabel.style.marginLeft = "15px";
-                checkboxLabel.style.fontSize = "14px";
-                checkboxLabel.style.fontWeight = "bold";
-                //move both the checkbox and the label to the left
-                checkboxLabel.style.position = "relative";
-                checkboxLabel.style.left = "-10px"; //move the label to the left
-                
-                // Append the checkbox to the label
-                checkboxLabel.appendChild(checkbox);
-
-                // Append the label to the td element
-                resultatColumns[j].appendChild(checkboxLabel);
-
-                let infoLinje = resultatColumns[j].querySelector(".infoLinje");
-                infoLinje.appendChild(checkboxLabel);    
+                resultatColumns[j].appendChild(createCheckbox(grade));
             }
         }
     }
+}
+// Create a checkbox element and return it
+// The checkbox will have the grade as its value
+function createCheckbox(grade) {
+    // Create a new checkbox element
+    let checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "grade-checkbox";
+    checkbox.value = grade;
+    checkbox.style.verticalAlign = "middle";
+    checkbox.style.position = "relative";
+
+    // Create a new label element
+    let checkboxLabel = document.createElement("label");
+    checkboxLabel.appendChild(document.createTextNode("Velg"));
+    checkboxLabel.style.color = "black";
+    checkboxLabel.style.verticalAlign = "middle";
+    checkboxLabel.style.marginTop = "10px";
+    checkboxLabel.style.marginLeft = "15px";
+    checkboxLabel.style.fontSize = "14px";
+    checkboxLabel.style.fontWeight = "bold";
+    //move both the checkbox and the label to the left
+    checkboxLabel.style.position = "relative";
+    checkboxLabel.style.left = "-10px"; //move the label to the left
+
+    // Append the checkbox to the label
+    checkboxLabel.appendChild(checkbox);
+
+    // Append the label to the td element
+    return checkboxLabel;
 }
 
 findGrades();
@@ -147,7 +148,6 @@ for (let i = 0; i < checkboxes.length; i++) {
         // If there is at least one checkbox selected and at least one checkbox with a letter grade selected, calculate the average
         for (let j = 0; j < checkboxes.length; j++) {
             if (checkboxes[j].checked) {
-                console.log(checkboxes[j].value);
                 checkboxCount++;
                 if (checkboxes[j].value !== "Bestått" && checkboxes[j].value !== "Passed" && checkboxes[j].value !== "Greidd") {
                     hasLetterGrade = true;
@@ -157,7 +157,6 @@ for (let i = 0; i < checkboxes.length; i++) {
         if (checkboxCount > 0 && hasLetterGrade) {
             calculate();
         } else {
-            console.log(checkboxCount);
             if (checkboxCount === 0){
                 p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
             } else {
@@ -166,6 +165,7 @@ for (let i = 0; i < checkboxes.length; i++) {
         }
     });
 }
+
 function calculate(){
     let totaltEcts = 0;
     let totaltEctsForCalculation = 0;
