@@ -91,25 +91,9 @@ let hasLetterGrade = false; // flag to keep track of whether a checkbox with a l
 // Add event listener for the button
 button.addEventListener("click", function(event) {
     event.preventDefault();
-    let allChecked = true;
-    // Check if all checkboxes are checked
-    for (let i = 0; i < checkboxes.length; i++) {
-        if (!checkboxes[i].checked) {
-            allChecked = false; // If at least one checkbox is not checked, set the flag to false
-            break;
-        }
-    }
-    // If all checkboxes are checked, uncheck all checkboxes and change the button text to "Velg alle"
-    if (allChecked) {
-        for (let i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].checked = false;
-            if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
-                hasLetterGrade = false; // If a checkbox with a letter grade is unchecked, set the flag to false
-            }
-        }
-        button.innerHTML = "Velg alle";
-    // If not all checkboxes are checked, check all checkboxes and change the button text to "Fjern alle"
-    } else {
+    let hasLetterGrade = false;
+    // If the button text is "Velg alle", check all checkboxes and change the button text to "Fjern alle"
+    if (button.innerHTML === "Velg alle") {
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = true;
             if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
@@ -117,25 +101,15 @@ button.addEventListener("click", function(event) {
             }
         }
         button.innerHTML = "Fjern alle";
-    }
-    checkboxCount = 0;
-    // If there is at least one checkbox selected and at least one checkbox with a letter grade selected, calculate the average
-    for (let i = 0; i < checkboxes.length; i++) {
-        if (checkboxes[i].checked) {
-            checkboxCount++;
-            if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
-                hasLetterGrade = true;
-            }
+        if (hasLetterGrade) calculate();
+    } 
+    // If the button text is "Fjern alle", uncheck all checkboxes and change the button text to "Velg alle"
+    else {
+        for (let i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = false;
         }
-    }
-    if (checkboxCount > 0 && hasLetterGrade) {
-        calculate();
-    } else {
-        if (checkboxCount === 0){
-            p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
-        } else {
-            p.innerHTML = "Du må velge minst ett emne som har bokstavkarakter for å kunne regne ut snittet ditt.";
-        }
+        button.innerHTML = "Velg alle";
+        p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
     }
 });
 
@@ -154,6 +128,13 @@ for (let i = 0; i < checkboxes.length; i++) {
                 }
             }
         }
+
+        if (checkboxCount == 0 ) {
+            button.innerHTML = "Velg alle";
+        } else if (checkboxCount == checkboxes.length) {
+            button.innerHTML = "Fjern alle";
+        }
+
         if (checkboxCount > 0 && hasLetterGrade) {
             calculate();
         } else {
