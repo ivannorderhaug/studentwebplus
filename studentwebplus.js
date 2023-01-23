@@ -3,29 +3,25 @@ console.log("studentwebplus.js loaded successfully");
 // It will add checkboxes to each row that has a valid grade and a button that can be used to select all the checkboxes.
 // It will also calculate the average grade for the selected checkboxes.
 // The script will also add a button that can be used to select all the checkboxes.
-let grades = []
 let table = document.querySelector(".table-standard.reflow.ui-panel-content");
 let resultatRows = table.querySelectorAll("tr.resultatTop, tr.none");
 
 // Loop through all the rows in the table and find the grades in the 6th column (index 5) and add them to the grades array. 
 // Each row that has a valid grade will also get a checkbox appended to it.
 function findGrades(){
-    grades = []
     for (let i = 0; i < resultatRows.length; i++) {
-        let resultatColumns = resultatRows[i].querySelectorAll("td.col6Resultat");
-        for (let j = 0; j < resultatColumns.length; j++) {
-            let grade = resultatColumns[j].querySelector(".infoLinje span").textContent.trim();
-            let pattern = /^[A-E]|Bestått|Passed|Greidd$/;
-            let isValidGrade = pattern.test(grade);
-            if (isValidGrade) {
-                grades.push(grade);
-                resultatColumns[j].appendChild(createCheckbox(grade));
-            }
+        let resultatColumn = resultatRows[i].querySelector("td.col6Resultat");
+        let grade = resultatColumn.querySelector(".infoLinje span").textContent.trim();
+        let pattern = /^[A-E]|Bestått|Passed|Greidd$/;
+        let isValidGrade = pattern.test(grade);
+        if (isValidGrade) {
+
+            resultatColumn.appendChild(createCheckbox(grade));
+            resultatColumn.appendChild(createEditButton());
         }
     }
 }
-// Create a checkbox element and return it
-// The checkbox will have the grade as its value
+
 function createCheckbox(grade) {
     // Create a new checkbox element
     let checkbox = document.createElement("input");
@@ -34,25 +30,51 @@ function createCheckbox(grade) {
     checkbox.value = grade;
     checkbox.style.verticalAlign = "middle";
     checkbox.style.position = "relative";
+    checkbox.style.left = "5px";
+    return checkbox;
+}
 
-    // Create a new label element
-    let checkboxLabel = document.createElement("label");
-    checkboxLabel.appendChild(document.createTextNode("Velg"));
-    checkboxLabel.style.color = "black";
-    checkboxLabel.style.verticalAlign = "middle";
-    checkboxLabel.style.marginTop = "10px";
-    checkboxLabel.style.marginLeft = "15px";
-    checkboxLabel.style.fontSize = "14px";
-    checkboxLabel.style.fontWeight = "bold";
-    //move both the checkbox and the label to the left
-    checkboxLabel.style.position = "relative";
-    checkboxLabel.style.left = "-10px"; //move the label to the left
+function createEditButton() {
+    // Create a new button element
+    let editButton = document.createElement("button");
+    editButton.innerHTML = "Endre";
+    editButton.className = "edit-button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only small grey";
+    editButton.style.position = "relative";
+    editButton.style.left = "8px";
+    editButton.style.top = "-25px";
+    editButton.style.fontSize = "12px";
+    editButton.style.scale = "0.75";
+    editButton.style.marginLeft = "59px";
 
-    // Append the checkbox to the label
-    checkboxLabel.appendChild(checkbox);
+    editButton.addEventListener("click", function(event) {
+        event.preventDefault();
+        
+        let span = this.parentNode.querySelector(".infoLinje span");
+        let checkbox = this.parentNode.querySelector(".grade-checkbox");
+        
+        let newGrade = prompt("Skriv inn ny karakter (A-F eller bestått/greidd/passed):");
+        if (newGrade !== null) {
+            if (newGrade.length == 0) newGrade = newGrade.toUpperCase();
+            else {
+                newGrade = newGrade.charAt(0).toUpperCase() + newGrade.slice(1).toLowerCase();
+            }
 
-    // Append the label to the td element
-    return checkboxLabel;
+            let pattern = /^[A-E]|Bestått|Passed|Greidd$/;
+            let isValidGrade = pattern.test(newGrade);
+
+            if (isValidGrade) {
+                span.innerHTML = newGrade;
+                checkbox.value = newGrade;
+                if (checkbox.checked) calculate();
+                
+            } else {
+                alert("Ugyldig karakter. Prøv igjen.");
+            }
+        }
+
+    });
+
+    return editButton;
 }
 
 findGrades();
@@ -70,6 +92,9 @@ button.style.verticalAlign = "middle";
 button.style.cursor = "pointer";
 button.className = "ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only small grey";
 
+let td = document.createElement("td");
+td.style.border = "medium none";
+
 
 // Create a new button element
 let p = document.createElement("p");
@@ -79,10 +104,9 @@ p.style.fontSize = "14px";
 p.style.marginLeft = "25px";
 p.style.position = "relative";
 
-
-
 // Append the button to the last td element
-lastTd.appendChild(button);
+td.appendChild(button);
+lastRow.appendChild(td);
 lastRow.appendChild(p);
 
 let checkboxCount = 0;
@@ -186,4 +210,5 @@ function calculate(){
     }
 
     p.textContent = "Ditt snitt er " + snitt.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + totaltEcts + " studiepoeng)";
+    console.log("Ditt snitt utenavrunding er " + snitt.toFixed(2));
 }
