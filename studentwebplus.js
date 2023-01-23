@@ -63,7 +63,7 @@ function createEditButton() {
             let isValidGrade = pattern.test(newGrade);
 
             if (isValidGrade) {
-                span.innerHTML = newGrade;
+                span.textContent = newGrade;
                 checkbox.value = newGrade;
                 if (checkbox.checked) calculate();
                 
