@@ -100,8 +100,8 @@ const calc = new GradeCalculator();
     The grade itself will be stored as the value of the checkbox.
  */
 function init(){
-let table = document.querySelector(".table-standard.reflow.ui-panel-content");
-let resultRows = table.querySelectorAll("tr.resultatTop, tr.none");
+    let table = document.querySelector(".table-standard.reflow.ui-panel-content");
+    let resultRows = table.querySelectorAll("tr.resultatTop, tr.none");
 
     for (let i = 0; i < resultRows.length; i++) {
         let resultColumn = resultRows[i].querySelector("td.col6Resultat");
@@ -147,9 +147,9 @@ let resultRows = table.querySelectorAll("tr.resultatTop, tr.none");
                 }
             }
             button.innerHTML = "Velg alle";
-}
+        }
     });
-
+    
     let td = document.createElement("td");
     td.style.border = "medium none";
     
@@ -174,7 +174,6 @@ function createCheckbox() {
     let checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.className = "grade-checkbox";
-    checkbox.value = grade;
     checkbox.style.verticalAlign = "middle";
     checkbox.style.position = "relative";
     checkbox.style.left = "5px";
@@ -185,7 +184,6 @@ function createCheckbox() {
     @return the button element.
 */
 function createEditButton() {
-    // Create a new button element
     let editButton = document.createElement("button");
     editButton.innerHTML = "Endre";
     editButton.className = "edit-button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only small grey";
@@ -225,16 +223,14 @@ function createEditButton() {
                 }
                 //update the grade in the calculation object
                 calc.arrGrades[index] = newGrade;
-                
+
                 // update the average grade only if the checkbox is checked
                 if (checkbox.checked) getGrade();
             } else {
                 alert("Ugyldig karakter. Prøv igjen.");
             }
         }
-
     });
-
     return editButton;
 }
 
@@ -259,7 +255,7 @@ function updateGrade(checkbox, index) {
         calc.addGrade(calc.arrGrades[index], calc.arrEcts[index]);
     } else {
         calc.removeGrade(calc.arrGrades[index], calc.arrEcts[index]);
-    }        
+    }
     getGrade();
 
     // handle little edge case where if the user checks all the boxes manually, the select all button did not update to "select all"
@@ -268,7 +264,7 @@ function updateGrade(checkbox, index) {
     }
     else { 
         selectAllButton.innerHTML = "Velg alle";
-}
+    }
 }
 
 function getGrade(){
@@ -290,8 +286,3 @@ function getGrade(){
     }
 }
 
-
-// Converts a number to a letter grade
-function numberToLetter(grade){
-    return grade >= 4.5 ? 'A' : grade >= 3.5 ? 'B' : grade >= 2.5 ? 'C' : grade >= 1.5 ? 'D' : 'E';
-}
