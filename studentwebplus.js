@@ -115,106 +115,99 @@ td.appendChild(button);
 lastRow.appendChild(td);
 lastRow.appendChild(p);
 
-let checkboxCount = 0;
-let hasLetterGrade = false; // flag to keep track of whether a checkbox with a letter grade is selected
-
 // Add event listener for the button
 button.addEventListener("click", function(event) {
     event.preventDefault();
-    let hasLetterGrade = false;
-    // If the button text is "Velg alle", check all checkboxes and change the button text to "Fjern alle"
+
+    totaltEcts = totaltEctsForCalculation = sumGrades = checkboxCount = 0;
+
     if (button.innerHTML === "Velg alle") {
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = true;
-            if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
-                hasLetterGrade = true;
-            }
+            updateGrade(i);
         }
         button.innerHTML = "Fjern alle";
-        if (hasLetterGrade) calculate();
-    } 
-    // If the button text is "Fjern alle", uncheck all checkboxes and change the button text to "Velg alle"
+    }
     else {
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = false;
         }
         button.innerHTML = "Velg alle";
-        p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
     }
+
+    GetGrade();
 });
 
 // Add event listener for the checkboxes
 // When a checkbox is checked or unchecked, calculate the average
 for (let i = 0; i < checkboxes.length; i++) {
-    checkboxes[i].addEventListener('change', function() {
-        checkboxCount = 0;
-        hasLetterGrade = false;
-        // If there is at least one checkbox selected and at least one checkbox with a letter grade selected, calculate the average
-        for (let j = 0; j < checkboxes.length; j++) {
-            if (checkboxes[j].checked) {
-                checkboxCount++;
-                if (checkboxes[j].value !== "Bestått" && checkboxes[j].value !== "Passed" && checkboxes[j].value !== "Greidd") {
-                    hasLetterGrade = true;
-                }
-            }
-        }
-
-        if (checkboxCount == 0 ) {
-            button.innerHTML = "Velg alle";
-        } else if (checkboxCount == checkboxes.length) {
-            button.innerHTML = "Fjern alle";
-        }
-
-        if (checkboxCount > 0 && hasLetterGrade) {
-            calculate();
-        } else {
-            if (checkboxCount === 0){
-                p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
-            } else {
-                p.innerHTML = "Du må velge minst ett emne som har bokstavkarakter for å kunne regne ut snittet ditt.";
-            }
-        }
-    });
+    checkboxes[i].addEventListener('change', function() {updateGrade(i)});
 }
 
-function calculate(){
-    let totaltEcts = 0;
-    let totaltEctsForCalculation = 0;
-    let sumGrades = 0;
+function updateGrade(i){
+    let checkbox = checkboxes[i];
 
-    for (let i = 0; i < checkboxes.length; i++) {
-        if (checkboxes[i].checked) {
-            let ects = studyPoints[i];
-            totaltEcts += ects;
-            if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
-                let numberGrade = checkboxes[i].value.charCodeAt(0) <= 69 ? 5 - (checkboxes[i].value.charCodeAt(0) - 65) : 0;
-                totaltEctsForCalculation += ects;
-                sumGrades += numberGrade * ects;
-            }
-        }
+    if (checkbox.checked) {
+        AddSingleGrade(studyPoints[i], checkbox.value);
+    } else{
+        RemoveSingleGrade(studyPoints[i], checkbox.value);
+    }        
+    GetGrade();
+}
+
+let totaltEcts = 0;
+let totaltEctsForCalculation = 0;
+let sumGrades = 0;
+let checkboxCount = 0;
+
+function AddSingleGrade(ects, grade){
+    totaltEcts += ects;
+    if (!["Bestått","Passed","Greidd"].includes(grade)) {
+        totaltEctsForCalculation += ects;
+        sumGrades += letterToNumber(grade) * ects;
     }
+    checkboxCount++;
+}
 
+function RemoveSingleGrade(ects, grade){
+    totaltEcts -= ects;
+    if (!["Bestått","Passed","Greidd"].includes(grade)) {
+        totaltEctsForCalculation -= ects;
+        sumGrades -= letterToNumber(grade) * ects;
+    }    
+    checkboxCount--;
+}
+
+function GetGrade(){
     if (sumGrades == 0 && totaltEctsForCalculation > 0) {
         p.textContent = "Du har bestått alle emnene du har valgt, men de har ikke bokstavkarakter. Derfor kan vi ikke regne ut snittet ditt.";
         return;
     }
 
-    let snitt = (sumGrades / totaltEctsForCalculation);
+    const avg = sumGrades / totaltEctsForCalculation;
+    const letterGrade = numberToLetter(avg)
 
-    let letterGrade = "";
-
-    if (snitt >= 4.5) {
-        letterGrade = "A";
-    } else if (snitt >= 3.5 && snitt < 4.5) {
-        letterGrade = "B";
-    } else if (snitt >= 2.5 && snitt < 3.5) {
-        letterGrade = "C";
-    } else if (snitt >= 1.5 && snitt < 2.5) {
-        letterGrade = "D";
-    } else if (result < 1.5) {
-        letterGrade = "E";
+    if(isNaN(avg)){
+        p.innerHTML = checkboxCount === 0 ? 
+        "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.":
+        "Du må velge minst ett emne som har bokstavkarakter for å kunne regne ut snittet ditt.";
+    } else {
+        p.textContent = "Ditt snitt er " + avg.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + totaltEcts + " studiepoeng)";
+        console.log("Ditt snitt uten avrunding er " + avg.toFixed(2));
     }
+}
 
-    p.textContent = "Ditt snitt er " + snitt.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + totaltEcts + " studiepoeng)";
-    console.log("Ditt snitt utenavrunding er " + snitt.toFixed(2));
+function letterToNumber(grade){
+    const charCode = grade.charCodeAt(0)
+    return charCode <= 69 ? 5 - (charCode-65) : 0;
+}
+
+function numberToLetter(grade){
+    switch(true){
+        case grade >= 4.5: return "A";
+        case grade >= 3.5: return "B";
+        case grade >= 2.5: return "C";
+        case grade >= 1.5: return "D";
+        default:           return "E";
+    }
 }
