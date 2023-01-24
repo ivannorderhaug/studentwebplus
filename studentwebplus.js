@@ -93,31 +93,84 @@ class GradeCalculator {
     }
 }
 const calc = new GradeCalculator();
+/*
+    init will be called when the page is loaded.
+    It will find all the valid grades and add a checkbox and an edit button to each row. 
+    If a grade is valid, it's corresponding ects will be added to the studyPoints array.
+    The grade itself will be stored as the value of the checkbox.
+ */
+function init(){
 let table = document.querySelector(".table-standard.reflow.ui-panel-content");
 let resultRows = table.querySelectorAll("tr.resultatTop, tr.none");
 
-studyPoints = [];
-// Loop through all the rows in the table and find the grades in the 6th column (index 5) and add them to the grades array. 
-// Each row that has a valid grade will also get a checkbox appended to it.
-function findGrades(){
     for (let i = 0; i < resultRows.length; i++) {
         let resultColumn = resultRows[i].querySelector("td.col6Resultat");
-        let pointColumn = resultRows[i].querySelector("td.col7Studiepoeng")
+        let pointColumn = resultRows[i].querySelector("td.col7Studiepoeng");
         let grade = resultColumn.querySelector(".infoLinje span").textContent.trim();
-        let pattern = /^[A-E]|Bestått|Passed|Greidd$/;
-        let isValidGrade = pattern.test(grade);
+        let isValidGrade = calc.pattern.test(grade);
+
         if (isValidGrade && pointColumn.hasChildNodes()) {
                 let points = pointColumn.querySelector("span").textContent;
                 let parsedPoints = Number(points.replace(",", "."));
-                studyPoints.push(parsedPoints);
-                resultColumn.appendChild(createCheckbox(grade));
+                calc.arrEcts.push(parsedPoints);
+                calc.arrGrades.push(grade);
+                resultColumn.appendChild(createCheckbox());
                 resultColumn.appendChild(createEditButton());
             }
         }
-}
 
-function createCheckbox(grade) {
-    // Create a new checkbox element
+    let lastRow = document.querySelector("tr:last-of-type");
+    let button = document.createElement("button");
+    button.innerHTML = "Velg alle";
+    button.style.verticalAlign = "middle";
+    button.style.cursor = "pointer";
+    button.className = "ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only small grey";
+    button.id = "select-all-button";
+
+    button.addEventListener("click", function(event) {
+        event.preventDefault();
+        if (button.innerHTML === "Velg alle") {
+            for (let i = 0; i < checkboxes.length; i++) {
+                if (!checkboxes[i].checked) {
+                    checkboxes[i].checked = true;
+                    updateGrade(checkboxes[i], i);
+                }
+            }
+
+            button.innerHTML = "Fjern alle";
+        }
+        else {
+            for (let i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    checkboxes[i].checked = false;
+                    updateGrade(checkboxes[i], i);
+                }
+            }
+            button.innerHTML = "Velg alle";
+}
+    });
+
+    let td = document.createElement("td");
+    td.style.border = "medium none";
+    
+    let p = document.createElement("p");
+    p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
+    p.style.color = "black";
+    p.style.fontSize = "14px";
+    p.style.marginLeft = "25px";
+    p.style.position = "relative";
+    p.id = "info-text";
+    
+    td.appendChild(button);
+    lastRow.appendChild(td);
+    lastRow.appendChild(p);
+}
+/*
+    createCheckbox will create a new checkbox element.
+    The value of the checkbox will be set to the grade that is passed as a parameter.
+    @return the checkbox element.
+*/
+function createCheckbox() {
     let checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.className = "grade-checkbox";
@@ -127,7 +180,10 @@ function createCheckbox(grade) {
     checkbox.style.left = "5px";
     return checkbox;
 }
-
+/*
+    createEditButton will create a new button element.
+    @return the button element.
+*/
 function createEditButton() {
     // Create a new button element
     let editButton = document.createElement("button");
@@ -171,7 +227,8 @@ function createEditButton() {
     return editButton;
 }
 
-findGrades();
+init();
+console.log("Grades have been retrieved from the table and checkboxes have been added to the table.");
 
 let checkboxes = document.querySelectorAll('.grade-checkbox');
 
