@@ -196,27 +196,38 @@ function createEditButton() {
     editButton.style.scale = "0.75";
     editButton.style.marginLeft = "59px";
 
+    // Add an event listener to the button that will prompt the user to enter a new grade.
+    // If the grade is valid, the grade in the table will be updated and the average grade will be recalculated.
     editButton.addEventListener("click", function(event) {
         event.preventDefault();
         
         let span = this.parentNode.querySelector(".infoLinje span");
         let checkbox = this.parentNode.querySelector(".grade-checkbox");
-        
         let newGrade = prompt("Skriv inn ny karakter (A-F eller bestått/greidd/passed):");
         if (newGrade !== null) {
-            if (newGrade.length == 0) newGrade = newGrade.toUpperCase();
+            if (newGrade.length == 0) {
+                newGrade = newGrade.toUpperCase();
+            }
             else {
                 newGrade = newGrade.charAt(0).toUpperCase() + newGrade.slice(1).toLowerCase();
             }
 
-            let pattern = /^[A-E]|Bestått|Passed|Greidd$/;
-            let isValidGrade = pattern.test(newGrade);
+            let isValidGrade = calc.pattern.test(newGrade);
 
             if (isValidGrade) {
                 span.textContent = newGrade;
-                checkbox.value = newGrade;
-                if (checkbox.checked) calculate();
+                //get index of checkbox
+                let index = Array.prototype.indexOf.call(checkboxes, checkbox);
+                //if the checkbox is checked, then update the grade in the calculation object
+                if (checkbox.checked) {
+                    calc.removeGrade(calc.arrGrades[index], calc.arrEcts[index]);
+                    calc.addGrade(newGrade, calc.arrEcts[index]);
+                }
+                //update the grade in the calculation object
+                calc.arrGrades[index] = newGrade;
                 
+                // update the average grade only if the checkbox is checked
+                if (checkbox.checked) getGrade();
             } else {
                 alert("Ugyldig karakter. Prøv igjen.");
             }
