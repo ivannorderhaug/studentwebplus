@@ -84,14 +84,15 @@ class GradeCalculator {
     
     // Converts a letter grade to a number
     letterToNumber(grade){
-        return grade.charCodeAt(0) <= 69 ? 5 - (grade.charCodeAt(0) - 65) : 0;
+        return 5 - (grade.charCodeAt(0) - 65);
     }
 
     // Converts a number to a letter grade
     numberToLetter(grade){
-        return grade >= 4.5 ? 'A' : grade >= 3.5 ? 'B' : grade >= 2.5 ? 'C' : grade >= 1.5 ? 'D' : 'E';
+        return grade < 1.5 ? 'E' : String.fromCharCode(65 + (5- Math.round(grade)));
     }
 }
+
 const calc = new GradeCalculator();
 /*
     init will be called when the page is loaded.
