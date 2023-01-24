@@ -6,6 +6,9 @@
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
+### Jetbrains ###
+.idea
+
 # Local History for Visual Studio Code
 .history/
 

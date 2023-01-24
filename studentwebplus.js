@@ -4,25 +4,25 @@ console.log("studentwebplus.js loaded successfully");
 // It will also calculate the average grade for the selected checkboxes.
 // The script will also add a button that can be used to select all the checkboxes.
 let table = document.querySelector(".table-standard.reflow.ui-panel-content");
-let resultatRows = table.querySelectorAll("tr.resultatTop, tr.none");
+let resultRows = table.querySelectorAll("tr.resultatTop, tr.none");
 
 studyPoints = [];
 
 // Loop through all the rows in the table and find the grades in the 6th column (index 5) and add them to the grades array. 
 // Each row that has a valid grade will also get a checkbox appended to it.
 function findGrades(){
-    for (let i = 0; i < resultatRows.length; i++) {
-        let resultatColumn = resultatRows[i].querySelector("td.col6Resultat");
-        let pointColumn = resultatRows[i].querySelector("td.col7Studiepoeng")
-        let grade = resultatColumn.querySelector(".infoLinje span").textContent.trim();
+    for (let i = 0; i < resultRows.length; i++) {
+        let resultColumn = resultRows[i].querySelector("td.col6Resultat");
+        let pointColumn = resultRows[i].querySelector("td.col7Studiepoeng")
+        let grade = resultColumn.querySelector(".infoLinje span").textContent.trim();
         let pattern = /^[A-E]|Bestått|Passed|Greidd$/;
         let isValidGrade = pattern.test(grade);
         if (isValidGrade && pointColumn.hasChildNodes()) {
                 let points = pointColumn.querySelector("span").textContent;
                 let parsedPoints = Number(points.replace(",", "."));
                 studyPoints.push(parsedPoints);
-                resultatColumn.appendChild(createCheckbox(grade));
-                resultatColumn.appendChild(createEditButton());
+                resultColumn.appendChild(createCheckbox(grade));
+                resultColumn.appendChild(createEditButton());
             }
         }
 }
@@ -89,7 +89,6 @@ let checkboxes = document.querySelectorAll('.grade-checkbox');
 
 
 let lastRow = document.querySelector("tr:last-of-type");
-let lastTd = lastRow.querySelector("td:last-of-type");
 
 // Create a new button element
 let button = document.createElement("button");
@@ -178,43 +177,43 @@ for (let i = 0; i < checkboxes.length; i++) {
 }
 
 function calculate(){
-    let totaltEcts = 0;
-    let totaltEctsForCalculation = 0;
+    let totalEcts = 0;
+    let totalEctsForCalculation = 0;
     let sumGrades = 0;
 
     for (let i = 0; i < checkboxes.length; i++) {
         if (checkboxes[i].checked) {
             let ects = studyPoints[i];
-            totaltEcts += ects;
+            totalEcts += ects;
             if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
                 let numberGrade = checkboxes[i].value.charCodeAt(0) <= 69 ? 5 - (checkboxes[i].value.charCodeAt(0) - 65) : 0;
-                totaltEctsForCalculation += ects;
+                totalEctsForCalculation += ects;
                 sumGrades += numberGrade * ects;
             }
         }
     }
 
-    if (sumGrades == 0 && totaltEctsForCalculation > 0) {
+    if (sumGrades == 0 && totalEctsForCalculation > 0) {
         p.textContent = "Du har bestått alle emnene du har valgt, men de har ikke bokstavkarakter. Derfor kan vi ikke regne ut snittet ditt.";
         return;
     }
 
-    let snitt = (sumGrades / totaltEctsForCalculation);
+    let average = (sumGrades / totalEctsForCalculation);
 
     let letterGrade = "";
 
-    if (snitt >= 4.5) {
+    if (average >= 4.5) {
         letterGrade = "A";
-    } else if (snitt >= 3.5 && snitt < 4.5) {
+    } else if (average >= 3.5 && average < 4.5) {
         letterGrade = "B";
-    } else if (snitt >= 2.5 && snitt < 3.5) {
+    } else if (average >= 2.5 && average < 3.5) {
         letterGrade = "C";
-    } else if (snitt >= 1.5 && snitt < 2.5) {
+    } else if (average >= 1.5 && average < 2.5) {
         letterGrade = "D";
     } else if (result < 1.5) {
         letterGrade = "E";
     }
 
-    p.textContent = "Ditt snitt er " + snitt.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + totaltEcts + " studiepoeng)";
-    console.log("Ditt snitt utenavrunding er " + snitt.toFixed(2));
+    p.textContent = "Ditt snitt er " + average.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + totalEcts + " studiepoeng)";
+    console.log("Ditt snitt utenavrunding er " + average.toFixed(2));
 }
