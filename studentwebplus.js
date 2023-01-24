@@ -89,7 +89,6 @@ let checkboxes = document.querySelectorAll('.grade-checkbox');
 
 
 let lastRow = document.querySelector("tr:last-of-type");
-let lastTd = lastRow.querySelector("td:last-of-type");
 
 // Create a new button element
 let button = document.createElement("button");
