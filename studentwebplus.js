@@ -210,7 +210,7 @@ function calculate(){
         letterGrade = "C";
     } else if (average >= 1.5 && average < 2.5) {
         letterGrade = "D";
-    } else if (result < 1.5) {
+    } else if (average < 1.5) {
         letterGrade = "E";
     }
 
