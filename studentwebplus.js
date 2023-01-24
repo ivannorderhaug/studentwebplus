@@ -7,7 +7,6 @@ let table = document.querySelector(".table-standard.reflow.ui-panel-content");
 let resultRows = table.querySelectorAll("tr.resultatTop, tr.none");
 
 studyPoints = [];
-
 // Loop through all the rows in the table and find the grades in the 6th column (index 5) and add them to the grades array. 
 // Each row that has a valid grade will also get a checkbox appended to it.
 function findGrades(){
@@ -85,8 +84,6 @@ function createEditButton() {
 findGrades();
 
 let checkboxes = document.querySelectorAll('.grade-checkbox');
-//let studyPoints = document.querySelectorAll('.col7Studiepoeng span');
-
 
 let lastRow = document.querySelector("tr:last-of-type");
 
