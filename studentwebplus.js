@@ -6,20 +6,25 @@ console.log("studentwebplus.js loaded successfully");
 let table = document.querySelector(".table-standard.reflow.ui-panel-content");
 let resultatRows = table.querySelectorAll("tr.resultatTop, tr.none");
 
+studyPoints = [];
+
 // Loop through all the rows in the table and find the grades in the 6th column (index 5) and add them to the grades array. 
 // Each row that has a valid grade will also get a checkbox appended to it.
 function findGrades(){
     for (let i = 0; i < resultatRows.length; i++) {
         let resultatColumn = resultatRows[i].querySelector("td.col6Resultat");
+        let pointColumn = resultatRows[i].querySelector("td.col7Studiepoeng")
         let grade = resultatColumn.querySelector(".infoLinje span").textContent.trim();
         let pattern = /^[A-E]|Bestått|Passed|Greidd$/;
         let isValidGrade = pattern.test(grade);
-        if (isValidGrade) {
-
-            resultatColumn.appendChild(createCheckbox(grade));
-            resultatColumn.appendChild(createEditButton());
+        if (isValidGrade && pointColumn.hasChildNodes()) {
+                let points = pointColumn.querySelector("span").textContent;
+                let parsedPoints = Number(points.replace(",", "."));
+                studyPoints.push(parsedPoints);
+                resultatColumn.appendChild(createCheckbox(grade));
+                resultatColumn.appendChild(createEditButton());
+            }
         }
-    }
 }
 
 function createCheckbox(grade) {
@@ -80,7 +85,8 @@ function createEditButton() {
 findGrades();
 
 let checkboxes = document.querySelectorAll('.grade-checkbox');
-let studyPoints = document.querySelectorAll('.col7Studiepoeng span');
+//let studyPoints = document.querySelectorAll('.col7Studiepoeng span');
+
 
 let lastRow = document.querySelector("tr:last-of-type");
 let lastTd = lastRow.querySelector("td:last-of-type");
@@ -178,7 +184,7 @@ function calculate(){
 
     for (let i = 0; i < checkboxes.length; i++) {
         if (checkboxes[i].checked) {
-            let ects = Number(studyPoints[i].textContent.replace(",", "."));
+            let ects = studyPoints[i];
             totaltEcts += ects;
             if (checkboxes[i].value !== "Bestått" && checkboxes[i].value !== "Passed" && checkboxes[i].value !== "Greidd") {
                 let numberGrade = checkboxes[i].value.charCodeAt(0) <= 69 ? 5 - (checkboxes[i].value.charCodeAt(0) - 65) : 0;
