@@ -231,119 +231,54 @@ init();
 console.log("Grades have been retrieved from the table and checkboxes have been added to the table.");
 
 let checkboxes = document.querySelectorAll('.grade-checkbox');
-
-let lastRow = document.querySelector("tr:last-of-type");
-
-// Create a new button element
-let button = document.createElement("button");
-button.innerHTML = "Velg alle";
-button.style.verticalAlign = "middle";
-button.style.cursor = "pointer";
-button.className = "ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only small grey";
-
-let td = document.createElement("td");
-td.style.border = "medium none";
-
-
-// Create a new button element
-let p = document.createElement("p");
-p.innerHTML = "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.";
-p.style.color = "black";
-p.style.fontSize = "14px";
-p.style.marginLeft = "25px";
-p.style.position = "relative";
-
-// Append the button to the last td element
-td.appendChild(button);
-lastRow.appendChild(td);
-lastRow.appendChild(p);
-
-// Add event listener for the button
-button.addEventListener("click", function(event) {
-    event.preventDefault();
-
-    totaltEcts = totaltEctsForCalculation = sumGrades = checkboxCount = 0;
-
-    if (button.innerHTML === "Velg alle") {
-        for (let i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].checked = true;
-            updateGrade(i);
-        }
-        button.innerHTML = "Fjern alle";
-    }
-    else {
-        for (let i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].checked = false;
-        }
-        button.innerHTML = "Velg alle";
-    }
-
-    GetGrade();
-});
+let p = document.getElementById("info-text");
+let selectAllButton = document.getElementById("select-all-button");
 
 // Add event listener for the checkboxes
 // When a checkbox is checked or unchecked, calculate the average
 for (let i = 0; i < checkboxes.length; i++) {
-    checkboxes[i].addEventListener('change', function() {updateGrade(i)});
+    checkboxes[i].addEventListener('change', function() {
+        updateGrade(this, i);
+    });
 }
 
-function updateGrade(i){
-    let checkbox = checkboxes[i];
-
+// Updates the grade in the calculation object
+function updateGrade(checkbox, index) {
     if (checkbox.checked) {
-        AddSingleGrade(studyPoints[i], checkbox.value);
-    } else{
-        RemoveSingleGrade(studyPoints[i], checkbox.value);
+        calc.addGrade(calc.arrGrades[index], calc.arrEcts[index]);
+    } else {
+        calc.removeGrade(calc.arrGrades[index], calc.arrEcts[index]);
     }        
-    GetGrade();
-}
+    getGrade();
 
-let totaltEcts = 0;
-let totaltEctsForCalculation = 0;
-let sumGrades = 0;
-let checkboxCount = 0;
-
-function AddSingleGrade(ects, grade){
-    totaltEcts += ects;
-    if (!["Bestått","Passed","Greidd"].includes(grade)) {
-        totaltEctsForCalculation += ects;
-        sumGrades += letterToNumber(grade) * ects;
+    // handle little edge case where if the user checks all the boxes manually, the select all button did not update to "select all"
+    if (calc.selectedGradeCount === checkboxes.length) {
+        selectAllButton.innerHTML = "Fjern alle";
     }
-    checkboxCount++;
+    else { 
+        selectAllButton.innerHTML = "Velg alle";
+}
 }
 
-function RemoveSingleGrade(ects, grade){
-    totaltEcts -= ects;
-    if (!["Bestått","Passed","Greidd"].includes(grade)) {
-        totaltEctsForCalculation -= ects;
-        sumGrades -= letterToNumber(grade) * ects;
-    }    
-    checkboxCount--;
-}
-
-function GetGrade(){
-    if (sumGrades == 0 && totaltEctsForCalculation > 0) {
-        p.textContent = "Du har bestått alle emnene du har valgt, men de har ikke bokstavkarakter. Derfor kan vi ikke regne ut snittet ditt.";
+function getGrade(){
+    if (calc.sumGrades == 0 && calc.totalEctsForCalculation > 0) {
+        p.innerHTML = "Du har bestått alle emnene du har valgt, men de har ikke bokstavkarakter. Derfor kan vi ikke regne ut snittet ditt.";
         return;
     }
 
-    const avg = sumGrades / totaltEctsForCalculation;
-    const letterGrade = numberToLetter(avg)
+    const avg = calc.calculateAverage();
+    const letterGrade = calc.numberToLetter(avg)
 
     if(isNaN(avg)){
-        p.innerHTML = checkboxCount === 0 ? 
+        p.innerHTML = calc.selectedGradeCount === 0 ? 
         "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.":
         "Du må velge minst ett emne som har bokstavkarakter for å kunne regne ut snittet ditt.";
     } else {
-        p.textContent = "Ditt snitt er " + avg.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + totaltEcts + " studiepoeng)";
+        p.innerHTML = "Ditt snitt er " + avg.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + calc.totalEcts + " studiepoeng)";
         console.log("Ditt snitt uten avrunding er " + avg.toFixed(2));
     }
 }
 
-// Converts a letter grade to a number
-function letterToNumber(grade){
-    return grade.charCodeAt(0) <= 69 ? 5 - (grade.charCodeAt(0) - 65) : 0;
-}
 
 // Converts a number to a letter grade
 function numberToLetter(grade){
