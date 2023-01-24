@@ -1,8 +1,98 @@
 console.log("studentwebplus.js loaded successfully");
 
-// It will add checkboxes to each row that has a valid grade and a button that can be used to select all the checkboxes.
-// It will also calculate the average grade for the selected checkboxes.
-// The script will also add a button that can be used to select all the checkboxes.
+/*
+    GradeCalculator class
+    This class is used to calculate the average grade for the selected checkboxes.
+*/
+class GradeCalculator {
+    constructor() {
+        this.totalEcts = 0;
+        this.totalEctsForCalculation = 0;
+        this.selectedGradeCount = 0;
+        this.sumGrades = 0;
+        this.nonLetterGrades = ["Bestått","Passed","Greidd"];
+        this.pattern = /^[A-E]|Bestått|Passed|Greidd$/;
+        this.arrGrades = [];
+        this.arrEcts = [];
+    }
+
+    //get and set methods
+    get totalEcts() {
+        return this._totaltEcts;
+    }
+
+    set totalEcts(value) {
+        this._totaltEcts = value;
+    }
+
+    get totalEctsForCalculation() {
+        return this._totaltEctsForCalculation;
+    }
+
+    set totalEctsForCalculation(value) {
+        this._totaltEctsForCalculation = value;
+    }
+
+    get sumGrades() {
+        return this._sumGrades;
+    }
+
+    set sumGrades(value) {
+        this._sumGrades = value;
+    }
+
+    get nonLetterGrades() {
+        return this._nonLetterGrades;
+    }
+
+    set nonLetterGrades(value) {
+        this._nonLetterGrades = value;
+    }
+
+    get selectedGradeCount() {
+        return this._selectedGradeCount;
+    }
+
+    set selectedGradeCount(value) {
+        this._selectedGradeCount = value;
+    }
+
+    calculateAverage() {
+        let averageGrade = this.sumGrades / this.totalEctsForCalculation;
+        return averageGrade;
+    }
+
+    addGrade(grade, ects) {
+        this.totalEcts += ects;
+        if (!this.nonLetterGrades.includes(grade)) {
+            let gradeValue = this.letterToNumber(grade);
+            this.sumGrades += (gradeValue * ects);
+            this.totalEctsForCalculation += ects;
+        }
+        this.selectedGradeCount++;
+    }
+
+    removeGrade(grade, ects) {
+        this.totalEcts -= ects;
+        if (!this.nonLetterGrades.includes(grade)) {
+            let gradeValue = this.letterToNumber(grade);
+            this.sumGrades -= (gradeValue * ects);
+            this.totalEctsForCalculation -= ects;
+        }
+        this.selectedGradeCount--;
+    }
+    
+    // Converts a letter grade to a number
+    letterToNumber(grade){
+        return grade.charCodeAt(0) <= 69 ? 5 - (grade.charCodeAt(0) - 65) : 0;
+    }
+
+    // Converts a number to a letter grade
+    numberToLetter(grade){
+        return grade >= 4.5 ? 'A' : grade >= 3.5 ? 'B' : grade >= 2.5 ? 'C' : grade >= 1.5 ? 'D' : 'E';
+    }
+}
+const calc = new GradeCalculator();
 let table = document.querySelector(".table-standard.reflow.ui-panel-content");
 let resultRows = table.querySelectorAll("tr.resultatTop, tr.none");
 
