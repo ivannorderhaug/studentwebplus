@@ -193,17 +193,12 @@ function GetGrade(){
     }
 }
 
+// Converts a letter grade to a number
 function letterToNumber(grade){
-    const charCode = grade.charCodeAt(0)
-    return charCode <= 69 ? 5 - (charCode-65) : 0;
+    return grade.charCodeAt(0) <= 69 ? 5 - (grade.charCodeAt(0) - 65) : 0;
 }
 
+// Converts a number to a letter grade
 function numberToLetter(grade){
-    switch(true){
-        case grade >= 4.5: return "A";
-        case grade >= 3.5: return "B";
-        case grade >= 2.5: return "C";
-        case grade >= 1.5: return "D";
-        default:           return "E";
-    }
+    return grade >= 4.5 ? 'A' : grade >= 3.5 ? 'B' : grade >= 2.5 ? 'C' : grade >= 1.5 ? 'D' : 'E';
 }
