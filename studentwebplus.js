@@ -302,10 +302,10 @@ function populateTable() {
     degrees.forEach((degree, index) => {
         let row = document.createElement("tr");
         let degreeNameCell = document.createElement("td");
-        degreeNameCell.textContent = degree.name;
+        degreeNameCell.textContent = degree._name;
         let gradeAverageCell = document.createElement("td");
 
-        let results = extractGrades(degree.startYear, degree.endYear);
+        let results = extractGrades(degree._startYear, degree._endYear);
         gradeAverageCell.textContent = results.avg.toFixed(1);
 
         let pointsCell = document.createElement("td");
