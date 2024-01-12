@@ -1,3 +1,49 @@
+const lang = document.querySelector("html").getAttribute("lang");
+
+const langMap = {
+    "nb": {
+        "title": "Karakterkalkulator",
+        "spring": "VÅR",
+        "autumn": "HØST",
+        "summer": "SOMMER",
+        "passed": "Bestått",
+        "study": "Studie",
+        "average": "Snitt",
+        "points": "Studiepoeng",
+        "addBtnTxt": "Legg til",
+        "start": "Start",
+        "end" : "Slutt"
+    }, 
+    "en": {
+        "title": "Grade Calculator",
+        "spring": "SPRING",
+        "autumn": "AUTUMN",
+        "summer": "SUMMER",
+        "passed": "Passed",
+        "study": "Study",
+        "average": "Average",
+        "points": "ECTS",
+        "addBtnTxt": "Add",
+        "start": "Start",
+        "end" : "End"
+
+    },
+    "nn": {
+        "title": "Karakterkalkulator",
+        "spring": "VÅR",
+        "autumn": "HAUST",
+        "summer": "SOMMER",
+        "passed": "Greidd",
+        "study": "Studie",
+        "average": "Snitt",
+        "points": "Studiepoeng,",
+        "addBtnTxt": "Legg til",
+        "start": "Start",
+        "end": "Slutt",
+
+    },
+}
+
 class Degree {
     constructor(name, startYear, endYear) {
         this.name = name;
@@ -119,7 +165,7 @@ function createCustomMenu() {
     header.style.color = "white";
     header.style.padding = "10px";
     header.style.textAlign = "center";
-    header.textContent = "Karakterkalkulator";
+    header.textContent = langMap[lang].title;
 
     let exitButton = document.createElement("button");
     exitButton.textContent = "X";
@@ -159,15 +205,14 @@ function createCustomMenu() {
     form.style.textAlign = "left";
 
     let degreeNameLabel = document.createElement("label");
-    degreeNameLabel.textContent = "Studie: ";
+    degreeNameLabel.textContent = langMap[lang].study + ": ";
 
     let degreeNameInput = document.createElement("input");
     degreeNameInput.type = "text";
     degreeNameInput.style.width = "90%";
 
     let startYearLabel = document.createElement("label");
-    startYearLabel.textContent = "Start: ";
-    
+    startYearLabel.textContent = langMap[lang].start + ": ";
     let startYear = document.createElement("input");
     startYear.type = "number";
     startYear.min = "1950";
@@ -175,7 +220,7 @@ function createCustomMenu() {
     startYear.style.width = "90%"
 
     let endYearLabel = document.createElement("label");
-    endYearLabel.textContent = "Slutt/Forventet Slutt: ";
+    endYearLabel.textContent = langMap[lang].end + ": ";
 
     let endyear = document.createElement("input");
     endyear.type = "number";
@@ -184,7 +229,7 @@ function createCustomMenu() {
     endyear.style.width = "90%"
 
     let addButton = document.createElement("button");
-    addButton.textContent = "Legg til";
+    addButton.textContent = langMap[lang].addBtnTxt;
     addButton.className = "ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only small grey";
 
     addButton.addEventListener("click", function(event) {
@@ -241,13 +286,13 @@ function createCustomMenu() {
     let thead = document.createElement("thead");
     let headerRow = document.createElement("tr");
     let degreeNameHeader = document.createElement("th");
-    degreeNameHeader.textContent = "Studie";
+    degreeNameHeader.textContent = langMap[lang].study;
     degreeNameHeader.style.minWidth = "100px"; 
     let gradeAverageHeader = document.createElement("th");
-    gradeAverageHeader.textContent = "Snitt";
+    gradeAverageHeader.textContent = langMap[lang].average;
     gradeAverageHeader.style.minWidth = "50px"; 
     let pointsHeader = document.createElement("th");
-    pointsHeader.textContent = "Studiepoeng";
+    pointsHeader.textContent = langMap[lang].points;
     pointsHeader.style.minWidth = "50px"; 
     let removeHeader = document.createElement("th");
     removeHeader.textContent = "";
@@ -306,14 +351,18 @@ function populateTable() {
         let gradeAverageCell = document.createElement("td");
 
         let results = extractGrades(degree._startYear, degree._endYear);
-        gradeAverageCell.textContent = results.avg.toFixed(1);
-
+        if (results.avg == null) {
+            gradeAverageCell.textContent = results.letterGrade;
+        } else {
+            gradeAverageCell.textContent = results.avg.toFixed(1)  + " (" + results.letterGrade + ")";
+        }
         let pointsCell = document.createElement("td");
         pointsCell.textContent = results.points;
 
         let removeCell = document.createElement("td");
         let a = document.createElement("a");
         a.textContent = "X";
+        a.style.cursor = "pointer";
         a.addEventListener("click", function () {
             degrees.splice(index, 1);
             localStorage.setItem("degrees", JSON.stringify(degrees));
@@ -363,16 +412,18 @@ function extractGrades(start, end){
             const year = parseInt(semesterText.match(/\d+/)[0]);
 
             if (
-                (semesterText.includes(start.toString()) && (semesterText.includes("HØST"))) ||
+                (semesterText.includes(start.toString()) && (semesterText.includes(langMap[lang].autumn))) ||
                 (year > start && year < end) ||
-                (semesterText.includes(end.toString()) && (semesterText.includes("VÅR") || semesterText.includes("SOMMER")))
+                (semesterText.includes(end.toString()) && (semesterText.includes(langMap[lang].spring) || semesterText.includes(langMap[lang].summer)))
             ) {
                 calc.addGrade(grade, parsedPoints);
             }
         });
 
-        if (calc.sumGrades == 0 && calc.totalEctsForCalculation > 0) {
-            return "Bestått";
+        if (calc.sumGrades == 0 && calc.totalEcts > 0) {
+            console.log("No letter grades found for this period");
+
+            return {avg: null, letterGrade: langMap[lang].passed, points: calc.totalEcts};
         }
 
         const avg = calc.calculateAverage();
