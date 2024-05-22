@@ -1,12 +1,17 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Studentweb+",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "description": "An extension that adds some extra features to Studentweb.",
     "icons": {
         "48": "icons/icon.png"
     },
-    "permissions": ["https://fsweb.no/studentweb/resultater.jsf"],
+    "host_permissions": [
+        "https://fsweb.no/studentweb/resultater.jsf"
+    ],
+    "permissions": [
+        "storage"
+    ],
     "content_scripts": [
         {
             "matches": ["https://fsweb.no/studentweb/resultater.jsf"],

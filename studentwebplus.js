@@ -95,11 +95,11 @@ class GradeCalculator {
     }
 
     get totalEctsForCalculation() {
-        return this._totaltEctsForCalculation;
+        return this._totalEctsForCalculation;
     }
 
     set totalEctsForCalculation(value) {
-        this._totaltEctsForCalculation = value;
+        this._totalEctsForCalculation = value;
     }
 
     get nonLetterGrades() {
@@ -111,7 +111,7 @@ class GradeCalculator {
     }
 
     calculateAverage() {
-        return this._totalEctsForCalculation === 0 ? 0 : this.sumGrades / this.totalEctsForCalculation;
+        return this.totalEctsForCalculation === 0 ? 0 : this.sumGrades / this.totalEctsForCalculation;
     }
 
     addGrade(grade, ects) {
