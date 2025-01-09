@@ -282,7 +282,7 @@ function getGrade(){
         "Start med å velge emner du vil regne snittet ditt ut fra eller klikk på knappen for å velge alle emner.":
         "Du må velge minst ett emne som har bokstavkarakter for å kunne regne ut snittet ditt.";
     } else {
-        p.innerHTML = "Ditt snitt er " + avg.toFixed(1) + ", noe som tilsvarer en " + letterGrade + ". (" + calc.totalEcts + " studiepoeng)";
+        p.innerHTML = "Ditt snitt er " + avg.toFixed(2) + ", noe som tilsvarer en " + letterGrade + ". (" + calc.totalEcts + " studiepoeng)";
         console.log("Ditt snitt uten avrunding er " + avg.toFixed(2));
     }
 }
